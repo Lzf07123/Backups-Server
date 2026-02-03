@@ -1,0 +1,22 @@
+services:
+  kanboard:
+    image: kanboard/kanboard:latest
+    container_name: kanboard
+    restart: unless-stopped
+    ports:
+     - "880:80"
+    volumes:
+     - ./kanboard/data:/var/www/app/data
+     - ./kanboard/plugins:/var/www/app/plugins
+     - ./kanboard/ssl:/etc/nginx/ssl
+     - /etc/localtime:/etc/localtime:ro
+     - /etc/timezone:/etc/timezone:ro
+    environment:
+     - PLUGIN_INSTALLER=true
+     - TZ=Asia/Shanghai
+     - MAIL_FROM=halo@lizf.cn
+     - MAIL_SMTP_HOSTNAME=smtp.qiye.aliyun.com
+     - MAIL_SMTP_PORT=465
+     - MAIL_SMTP_USERNAME=halo@lizf.cn
+     - MAIL_SMTP_PASSWORD=KxUClZoYYDUrTyjK
+     - MAIL_SMTP_ENCRYPTION=ssl

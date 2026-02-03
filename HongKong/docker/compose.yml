@@ -1,0 +1,61 @@
+services:
+  nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Shanghai"
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
+
+  alist:
+    image: 'xhofe/alist:latest'
+    container_name: alist
+    volumes:
+      - './alist:/opt/alist/data'
+      - ./alist/resources:/mnt/resources
+    ports:
+      - '5244:5244'
+    environment:
+      - TZ=Asia/Shanghai
+      - PUID=0
+      - PGID=0
+      - UMASK=022
+    restart: unless-stopped
+
+  moments:
+    image: kingwrcy/moments:latest
+    container_name: moments
+    ports:
+      - 3101:3000
+    environment:
+      - JWT_KEY=${JWT_KEY}
+      - PORT=3000
+    volumes:
+      - ./moments/data:/app/data
+    restart: unless-stopped
+  
+  xui:
+    image: ghcr.io/xeefei/x-panel:latest
+    container_name: xui
+    environment:
+      - XRAY_VMESS_AEAD_FORCED=false
+    volumes:
+      - ./xui/db/:/etc/x-ui/
+      - ./xui/cert/:/root/cert/
+    network_mode: host
+    restart: unless-stopped
+  frp-panel-server:
+    image: vaalacat/frp-panel
+    container_name: frp-panel-server
+    network_mode: host
+    restart: unless-stopped
+    command: #server -s 92a56e4f-33a9-466a-bdda-075ffef69545 -i admin.s.1 --api-url http://frp.4.lizf.cn:9000 --rpc-url grpc://frp.4.lizf.cn:9001
+
+
+
