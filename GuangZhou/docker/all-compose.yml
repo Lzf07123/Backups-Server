@@ -12,19 +12,6 @@ services:
     volumes:
       - ./nginx/data:/data
       - ./nginx/letsencrypt:/etc/letsencrypt
-#  alist:
-#    image: 'xhofe/alist:latest'
-#    container_name: alist
-#    volumes:
-#      - '/mnt/docker/alist:/opt/alist/data'
-#    ports:
-#      - '5244:5244'
-#    environment:
-#      - TZ=Asia/Shanghai
-#      - PUID=0
-#      - PGID=0
-#      - UMASK=022
-#    restart: unless-stopped
   halo:
     image: registry.fit2cloud.com/halo/halo:2.22
     container_name: halo
@@ -46,15 +33,12 @@ services:
       start_period: 30s
     environment:
       - TZ=Asia/Shanghai
-      # JVM 参数，默认为 -Xmx256m -Xms256m，可以根据实际情况做调整，置空表示不添加 JVM 参数
       - JVM_OPTS=-Xmx1024m -Xms256m
     command:
       - --spring.r2dbc.url=r2dbc:pool:postgresql://halodb/halo
       - --spring.r2dbc.username=halo
-      # PostgreSQL 的密码，请保证与下方 POSTGRES_PASSWORD 的变量值一致。
       - --spring.r2dbc.password=Lzf07123.
       - --spring.sql.init.platform=postgresql
-      # 外部访问地址，请根据实际需要修改
       - --halo.external-url=http://localhost:8090/
   halodb:
     image: postgres:15.4
@@ -75,25 +59,6 @@ services:
       - POSTGRES_USER=halo
       - POSTGRES_DB=halo
       - PGUSER=halo
-  frpp-master:
-    image: vaalacat/frp-panel:latest
-    container_name: frpp-master
-    network_mode: host
-    environment:
-      APP_GLOBAL_SECRET: your_secret # 随便输入一些随机字符，不要泄露
-      MASTER_RPC_HOST: frp.4.lizf.cn # 服务器的外部IP或域名
-      MASTER_RPC_PORT: 9001 # RPC 监听端口
-      MASTER_API_HOST: frp.4.lizf.cn # 服务器的外部IP或域名
-      MASTER_API_PORT: 9000 # API/WebUI监听端口
-      # CLIENT_RPC_URL和CLIENT_API_URL请根据实际情况设置，设置为外部可以通过url访问到master的形式
-      # Client 连接 master RPC 的 URL，如果使用反向代理，请设置为通过反向代理访问的 URL（如wss://example.com:443）
-      CLIENT_RPC_URL: grpc://frp.4.lizf.cn:9001
-      # Client 连接 master API/WebUI 的 URL，如果使用反向代理，请设置为通过反向代理访问的 URL（如https://example.com:443）
-      CLIENT_API_URL: http://frp.4.lizf.cn:9000
-    volumes:
-      - ./frp/data:/data # 数据存储位置
-    restart: unless-stopped
-    command: master
   meilisearch:
     image: getmeili/meilisearch:v1.15
     container_name: meilisearch
@@ -106,6 +71,14 @@ services:
       - ./meilisearch:/meili_data
     ports:
       - 7700:7700
-
+  frps:
+    image: snowdreamtech/frps:debian
+    container_name: frps
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./frp/frps.toml:/etc/frp/frps.toml
+    network_mode: host
 networks:
   halo_network:

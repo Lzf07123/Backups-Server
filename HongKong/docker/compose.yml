@@ -2,7 +2,7 @@ services:
   nginx:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: nginx
-    restart: unless-stopped
+    restart: always
     environment:
       TZ: "Asia/Shanghai"
     ports:
@@ -26,7 +26,7 @@ services:
       - PUID=0
       - PGID=0
       - UMASK=022
-    restart: unless-stopped
+    restart: always
 
   moments:
     image: kingwrcy/moments:latest
@@ -38,7 +38,7 @@ services:
       - PORT=3000
     volumes:
       - ./moments/data:/app/data
-    restart: unless-stopped
+    restart: always
   
   xui:
     image: ghcr.io/xeefei/x-panel:latest
@@ -49,13 +49,22 @@ services:
       - ./xui/db/:/etc/x-ui/
       - ./xui/cert/:/root/cert/
     network_mode: host
-    restart: unless-stopped
-  frp-panel-server:
-    image: vaalacat/frp-panel
-    container_name: frp-panel-server
+    restart: always
+  frps:
+    image: snowdreamtech/frps:debian
+    container_name: frps
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./frp/frps.toml:/etc/frp/frps.toml
     network_mode: host
-    restart: unless-stopped
-    command: #server -s 92a56e4f-33a9-466a-bdda-075ffef69545 -i admin.s.1 --api-url http://frp.4.lizf.cn:9000 --rpc-url grpc://frp.4.lizf.cn:9001
-
-
+  agent:
+    container_name: portainer-agent
+    image: portainer/agent:2.33.6
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/agent/volumes:/var/lib/docker/volumes
+    network_mode: host
 
