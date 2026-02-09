@@ -1,9 +1,9 @@
 #!/bin/bash
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install wget
-sudo apt-get install docker.io
-sudo apt-get install docker-compose-v2
+sudo apt-get install sudo wget -y
+sudo apt-get install docker.io -y
+sudo apt-get install docker-compose-v2 -y
 cd /mnt || exit
 sudo mkdir Agent
 cd Agent || exit
