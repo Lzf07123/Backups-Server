@@ -19,7 +19,7 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /mnt/agent/volumes:/var/lib/docker/volumes
+      - .agent/volumes:/var/lib/docker/volumes
     network_mode: host
 EOF
 docker compose up -d
